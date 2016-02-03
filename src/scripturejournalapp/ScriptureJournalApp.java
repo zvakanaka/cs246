@@ -31,6 +31,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -152,7 +153,7 @@ public class ScriptureJournalApp extends Application {
         loadJournal(inFile);
 
         defaultSetupJournal();
-        setupBars();
+        //setupBars();
         setupMenus(primaryStage);
 
         fileBoxes(primaryStage);
@@ -174,8 +175,8 @@ public class ScriptureJournalApp extends Application {
         grid.add(topicLbl,        1,  9, 1, 1);
         grid.add(sListView,       0, 10, 1, 1);
         grid.add(tListView,       1, 10, 1, 1);
-        grid.add(progBar1Lbl,     2,  9, 2, 1);
-        grid.add(progressBar1,    2, 10, 1, 1);
+        //grid.add(progBar1Lbl,     2,  9, 2, 1);
+        //grid.add(progressBar1,    2, 10, 1, 1);
         grid.add(wordCountBtn,    2, 12, 1, 1);
         grid.add(wordCountLbl,    0, 12, 1, 1);
         grid.add(searchLDSBtn,    0, 12, 1, 1);
@@ -278,11 +279,16 @@ public class ScriptureJournalApp extends Application {
             @Override
             public void handle(ActionEvent event) {
                 String search;
+                
                 Scripture selectedItem = sListView.getSelectionModel().getSelectedItem();
-                search = selectedItem.toUrl();
-                VisitWebsite vW = new VisitWebsite(search);
-                Thread t = new Thread(vW);
-                t.start();//does vW.run(); in a thread
+                if (selectedItem != null) {
+                    search = selectedItem.toUrl();
+                    VisitWebsite vW = new VisitWebsite(search);
+                    Thread t = new Thread(vW);
+                    t.start();//does vW.run(); in a thread
+                } else {
+                    System.err.println("Error: A scripture must be selected.");
+                }
             }
         });
         
@@ -307,7 +313,7 @@ public class ScriptureJournalApp extends Application {
             public void handle(MouseEvent event) {
                 System.out.println("Opening");
                 Entry selectedItem = listView.getSelectionModel().getSelectedItem();
-                System.out.println(selectedItem.getDate());
+//                System.out.println(selectedItem.getDate());
                 entryField.clear();
                 entryField.setText(selectedItem.getContent());
                 String currDate = selectedItem.getDate();
@@ -332,15 +338,19 @@ public class ScriptureJournalApp extends Application {
 
             @Override
             public void handle(MouseEvent event) {
-                String search;
-                Scripture selectedItem = sListView.getSelectionModel().getSelectedItem();
-                search = selectedItem.toUrl();
-                VisitWebsite vW = new VisitWebsite(search);
-                Thread t = new Thread(vW);
-                t.start();//does vW.run(); in a thread
+                if (event.getButton().equals(MouseButton.PRIMARY)) {
+                    if (event.getClickCount() == 2) {
+                        String search;
+                        Scripture selectedItem = sListView.getSelectionModel().getSelectedItem();
+                        search = selectedItem.toUrl();
+                        VisitWebsite vW = new VisitWebsite(search);
+                        Thread t = new Thread(vW);
+                        t.start();//does vW.run(); in a thread
+                    }
+                }
             }
         });
-        
+
         tListView.setItems(topicsOList);
         tListView.setPrefWidth(175);
         tListView.setPrefHeight(100);
@@ -357,7 +367,7 @@ public class ScriptureJournalApp extends Application {
         scriptureLbl.textProperty().setValue("Scriptures");
         topicLbl.textProperty().setValue("Topics");
         //TODO: make this actually work
-        progBar1Lbl.textProperty().setValue("Loading...");
+        //progBar1Lbl.textProperty().setValue("Loading...");
         //wordCountLbl.textProperty().setValue("");
     }
     
@@ -429,8 +439,8 @@ public class ScriptureJournalApp extends Application {
             public void handle(ActionEvent event) {
                 System.out.println("Filling entryField with template text...");
                 entryField.setText(entryField.getText() 
-                                   + "From class:\n\nWord count:\n"
-                                   + "\nReading:\n\nWord count:\n"
+                                   + "From class or reading 100:\n\nWord count:\n"
+                                   + "\nPre-Class Ponder Question 50:\n\nWord count:\n"
                                    + "\nQuestion:\n\n"
                                    + "\nPrompting:\n\n");
             }
@@ -611,6 +621,7 @@ public class ScriptureJournalApp extends Application {
         updateWordCount();
     }
 
+    //call may be commented out
     public void setupBars() {
         progressBar1.progressProperty().bind(barThread1.processProperty);
         Thread t1 = new Thread(barThread1);
