@@ -5,8 +5,10 @@
 package scripturejournalapp;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import static scripturejournalapp.FileServices.regexChecker;
 
 /**
@@ -19,7 +21,7 @@ public class Entry {
     private String date;
     private String title;
     private List<Scripture> sList;
-    private List<Topic> tList;
+    private Set<Topic> tList;
     
     public static void main(String[] args) {
         Entry e = new Entry();
@@ -27,7 +29,7 @@ public class Entry {
     }
     public Entry() {
         this.sList = new ArrayList<>();
-        this.tList = new ArrayList<>();
+        this.tList = new HashSet<>();
         this.content = "";
     }
    
@@ -51,7 +53,7 @@ public class Entry {
         return sList;
     }
 
-    public List<Topic> getTopics() {
+    public Set<Topic> getTopics() {
         return tList;
     }
        
